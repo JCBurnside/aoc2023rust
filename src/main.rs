@@ -1,6 +1,10 @@
 use std::io::Write;
 
-const DAYS: [[fn(); 2]; 0] = [];
+mod day01;
+
+const DAYS: [[fn(); 2]; 1] = [
+    [day01::part1,day01::part2]
+];
 fn main() {
     let mut input = String::new();
     loop {
