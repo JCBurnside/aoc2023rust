@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 type Data = Vec<Game>;
 
-#[cfg_attr(test, derive(PartialEq,Eq,Debug))]
+#[cfg_attr(test, derive(Debug))]
+#[derive(Hash,PartialEq,Eq,Clone,Copy)]
 enum Cube {
     Red,
     Green,
@@ -10,7 +13,7 @@ enum Cube {
 
 #[cfg_attr(test, derive(PartialEq,Eq,Debug))]
 struct Game {
-    game_id : usize,
+    id : usize,
     draws : Vec<Vec<(Cube,usize)>>
 }
 
@@ -32,20 +35,66 @@ fn parse_draw(draw:&str) -> Vec<(Cube,usize)> {
 fn parse(input : &str) -> Data {
     input.trim().lines()
     .map(|line| {
-        let Some((game_id, data)) = line.split_once(':') else { unreachable!("data in bad format. check id of {line}") };
-        let game_id = game_id[4..].trim().parse().unwrap();
+        let Some((id, data)) = line.split_once(':') else { unreachable!("data in bad format. check id of {line}") };
+        let id = id[4..].trim().parse().unwrap();
         
         Game {
-            game_id,
+            id,
             draws : data.split(';').map(parse_draw).collect()
         }
     })
     .collect()
 }
 
-pub fn part1() {}
+fn part1_impl(data : &Data) -> usize {
+    let check = HashMap::from([
+        (Cube::Red,12),
+        (Cube::Green,13),
+        (Cube::Blue,14)
+    ]);
+    data.iter()
+    .filter_map(|game| {
+        if !game.draws.iter().any(|draw| {
+            draw.iter().any(|(color, count)| {
+                check[color] < *count
+            })
+        }) {
+            Some(game.id)
+        } else {
+            None
+        }
+    })
+    .sum()
+}
 
-pub fn part2() {}
+pub fn part1() {
+    let data = parse(include_str!("../data/day02.txt"));
+    println!("the sum of all the games that are able to be drawn with the give configuration is {}", part1_impl(&data))
+}
+
+fn part2_impl(data:&Data) -> usize {
+    data.iter().map(|game|{
+        let mut mins = HashMap::from([
+            (Cube::Red,0),
+            (Cube::Green,0),
+            (Cube::Blue,0)
+        ]);
+        for draw in &game.draws {
+            for (color,count) in draw {
+                mins.entry(*color).and_modify(|min|{
+                    *min = (*min).max(*count);
+                });
+            }
+        }
+        mins.values().product::<usize>()
+    })
+    .sum()
+}
+
+pub fn part2() {
+    let data = parse(include_str!("../data/day02.txt"));
+    println!("sum of all the minimum power for each game is {}", part2_impl(&data));
+}
 
 #[cfg(test)]
 mod tests {
@@ -63,12 +112,24 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
         assert_eq!(
             data,
             [
-                Game { game_id : 1, draws: vec![vec![(Blue,3),(Red,4)],vec![(Red, 1),(Green, 2),(Blue,6)],vec![(Green,2)]]},
-                Game { game_id : 2, draws: vec![vec![(Blue,1),(Green,2)],vec![(Green, 3),(Blue, 4), (Red, 1)],vec![(Green, 1), (Blue,1)]]},
-                Game { game_id : 3, draws: vec![vec![(Green,8),(Blue,6),(Red,20)],vec![(Blue, 5),(Red, 4), (Green, 13)],vec![(Green, 5), (Red, 1)]]},
-                Game { game_id : 4, draws: vec![vec![(Green,1),(Red,3),(Blue,6)],vec![(Green, 3),(Red, 6)],vec![(Green, 3), (Blue,15), (Red,14)]]},
-                Game { game_id : 5, draws: vec![vec![(Red, 6), (Blue, 1), (Green, 3)],vec![(Blue,2), (Red,1),(Green, 2)]]},
+                Game { id : 1, draws: vec![vec![(Blue,3),(Red,4)],vec![(Red, 1),(Green, 2),(Blue,6)],vec![(Green,2)]]},
+                Game { id : 2, draws: vec![vec![(Blue,1),(Green,2)],vec![(Green, 3),(Blue, 4), (Red, 1)],vec![(Green, 1), (Blue,1)]]},
+                Game { id : 3, draws: vec![vec![(Green,8),(Blue,6),(Red,20)],vec![(Blue, 5),(Red, 4), (Green, 13)],vec![(Green, 5), (Red, 1)]]},
+                Game { id : 4, draws: vec![vec![(Green,1),(Red,3),(Blue,6)],vec![(Green, 3),(Red, 6)],vec![(Green, 3), (Blue,15), (Red,14)]]},
+                Game { id : 5, draws: vec![vec![(Red, 6), (Blue, 1), (Green, 3)],vec![(Blue,2), (Red,1),(Green, 2)]]},
             ]
         );
+    }
+
+    #[test]
+    fn part1() {
+        let data = super::parse(SAMPLE);
+        assert_eq!(super::part1_impl(&data),8)
+    }
+
+    #[test]
+    fn part2() {
+        let data = super::parse(SAMPLE);
+        assert_eq!(super::part2_impl(&data),2286)
     }
 }
