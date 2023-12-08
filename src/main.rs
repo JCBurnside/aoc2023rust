@@ -3,10 +3,10 @@ use std::io::Write;
 mod day01;
 mod day02;
 mod day03;
-const DAYS: [[fn(); 2]; 3] = [
-    [day01::part1,day01::part2],
-    [day02::part1,day02::part2],
-    [day03::part1,day03::part2],
+const DAYS: &'static [[fn(); 2]] = &[
+    [day01::part1, day01::part2],
+    [day02::part1, day02::part2],
+    [day03::part1, day03::part2],
 ];
 fn main() {
     let mut input = String::new();
