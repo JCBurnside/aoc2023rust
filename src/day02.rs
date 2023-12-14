@@ -52,19 +52,15 @@ fn parse(input: &str) -> Data {
         .collect()
 }
 
-fn part1_impl(data: &Data) -> usize {
+fn part1_impl(data: Data) -> usize {
     let check = HashMap::from([(Cube::Red, 12), (Cube::Green, 13), (Cube::Blue, 14)]);
     data.iter()
         .filter_map(|game| {
-            if !game
+            (!game
                 .draws
                 .iter()
                 .any(|draw| draw.iter().any(|(color, count)| check[color] < *count))
-            {
-                Some(game.id)
-            } else {
-                None
-            }
+            ).then_some(game.id)
         })
         .sum()
 }
@@ -73,18 +69,18 @@ pub fn part1() {
     let data = parse(include_str!("../data/day02.txt"));
     println!(
         "the sum of all the games that are able to be drawn with the give configuration is {}",
-        part1_impl(&data)
+        part1_impl(data)
     )
 }
 
-fn part2_impl(data: &Data) -> usize {
-    data.iter()
+fn part2_impl(data: Data) -> usize {
+    data.into_iter()
         .map(|game| {
             let mut mins = HashMap::from([(Cube::Red, 0), (Cube::Green, 0), (Cube::Blue, 0)]);
-            for draw in &game.draws {
+            for draw in game.draws {
                 for (color, count) in draw {
-                    mins.entry(*color).and_modify(|min| {
-                        *min = (*min).max(*count);
+                    mins.entry(color).and_modify(|min| {
+                        *min = (*min).max(count);
                     });
                 }
             }
@@ -97,7 +93,7 @@ pub fn part2() {
     let data = parse(include_str!("../data/day02.txt"));
     println!(
         "sum of all the minimum power for each game is {}",
-        part2_impl(&data)
+        part2_impl(data)
     );
 }
 
@@ -162,12 +158,12 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
     #[test]
     fn part1() {
         let data = super::parse(SAMPLE);
-        assert_eq!(super::part1_impl(&data), 8)
+        assert_eq!(super::part1_impl(data), 8)
     }
 
     #[test]
     fn part2() {
         let data = super::parse(SAMPLE);
-        assert_eq!(super::part2_impl(&data), 2286)
+        assert_eq!(super::part2_impl(data), 2286)
     }
 }

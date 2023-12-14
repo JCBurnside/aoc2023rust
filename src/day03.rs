@@ -140,6 +140,45 @@ pub fn part1() {
     println!("sum of all the valid part numbers is {}", part1_impl(&data));
 }
 
+pub fn part2_impl(input:&str) -> usize {
+    todo!("I'll be back");
+    let lines = input.trim().lines();
+    let mut gears = Vec::<usize>::new();
+
+
+    let fst = lines.clone().next().unwrap();
+    let snd = lines.clone().nth(1).unwrap();
+    for (idx, c) in fst.char_indices() {
+        if c != '*' {continue;}
+        let mut one = String::new();
+        let mut two = String::new();
+        if idx == 0 {
+            let mut looper = fst.chars().skip(1);
+            while let Some(c) = looper.next() {
+                if !c.is_numeric() {
+                    break;
+                }
+                one.push(c);
+            }
+            if snd.chars().next().unwrap().is_numeric() {
+                two = snd.chars().take_while(|c| c.is_numeric()).collect()
+            } else {
+                two = snd.chars().skip(1).take_while(|c| c.is_numeric()).collect()
+            }
+        } else {
+            if fst.chars().nth(idx - 1).unwrap().is_numeric() {
+                let mut start = idx -1;
+                
+            }
+        }
+        
+        if !one.is_empty() && !two.is_empty() {
+            gears.push(one.parse::<usize>().unwrap() * two.parse::<usize>().unwrap())
+        }
+    }
+    gears.into_iter().sum()
+}
+
 pub fn part2() {
     println!("not yet implemented")
 }

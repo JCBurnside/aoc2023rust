@@ -1,7 +1,7 @@
 type Data<'a> = Vec<&'a str>;
 const RAW_DATA: &'static str = include_str!("../data/day01.txt");
 
-fn part1_impl(data: &Data) -> usize {
+fn part1_impl(data: Data) -> usize {
     data.into_iter()
         .map(|line| {
             let chars = line.chars();
@@ -14,10 +14,10 @@ fn part1_impl(data: &Data) -> usize {
 
 pub fn part1() {
     let data: Data = RAW_DATA.trim().lines().map(str::trim).collect();
-    println!("the sum of the calibration data is {}", part1_impl(&data))
+    println!("the sum of the calibration data is {}", part1_impl(data))
 }
 
-fn part2_impl(data: &Data) -> usize {
+fn part2_impl(data: Data) -> usize {
     data.into_iter()
         .map(|line| {
             let chars = line.chars();
@@ -68,7 +68,7 @@ pub fn part2() {
     let data: Data = RAW_DATA.trim().lines().map(str::trim).collect();
     println!(
         "the sum of the calibration data accounting for words is {}",
-        part2_impl(&data)
+        part2_impl(data)
     )
 }
 
@@ -83,7 +83,7 @@ treb7uchet";
     #[test]
     fn part1() {
         let data: Data = SAMPLE_P1.trim().lines().map(str::trim).collect();
-        assert_eq!(super::part1_impl(&data), 142)
+        assert_eq!(super::part1_impl(data), 142)
     }
     const SAMPLE_P2: &'static str = r"two1nine
 eightwothree
@@ -95,6 +95,6 @@ zoneight234
     #[test]
     fn part2() {
         let data: Data = SAMPLE_P2.trim().lines().map(str::trim).collect();
-        assert_eq!(super::part2_impl(&data), 281);
+        assert_eq!(super::part2_impl(data), 281);
     }
 }
